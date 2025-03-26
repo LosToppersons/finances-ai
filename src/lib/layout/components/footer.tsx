@@ -10,7 +10,7 @@ export const Footer = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Finances-AI
+          Finanças-IA
         </Link>
       </Text>
     </Flex>

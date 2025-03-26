@@ -1,17 +1,24 @@
-import { Flex, Text } from '@chakra-ui/react';
+'use client';
+
+import { Flex, Grid, Text } from '@chakra-ui/react';
+import { SignUpStepsWithProvider } from './components/sign-up-steps';
 
 export const Home = () => {
   return (
-    <Flex
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      minHeight="70vh"
-      gap={4}
-      mb={8}
-      w="full"
-    >
-      <Text fontSize="xxx-large">Isto é Finances-AI</Text>
-    </Flex>
+    <Grid templateColumns="2fr 1fr" gap={10} minHeight="70vh" mb={8}>
+      <SignUpStepsWithProvider />
+
+      <Flex
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        borderRadius={8}
+        gap={4}
+        bg="#cce6ff"
+      >
+        <Text fontSize="xxx-large">Imagem do celular</Text>
+      </Flex>
+    </Grid>
   );
 };
+// 📲📱
