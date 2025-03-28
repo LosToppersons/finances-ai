@@ -1,11 +1,16 @@
 'use client';
 
-import { Flex, Grid, Text } from '@chakra-ui/react';
+import { Flex, Grid, Image } from '@chakra-ui/react';
 import { SignUpStepsWithProvider } from './components/sign-up-steps';
 
 export const Home = () => {
   return (
-    <Grid templateColumns="2fr 1fr" gap={10} minHeight="70vh" mb={8}>
+    <Grid
+      templateColumns={{ base: '1fr', md: '2fr 1fr' }}
+      gap={10}
+      minHeight="70vh"
+      mb={8}
+    >
       <SignUpStepsWithProvider />
 
       <Flex
@@ -14,11 +19,10 @@ export const Home = () => {
         justifyContent="center"
         borderRadius={8}
         gap={4}
-        bg="#cce6ff"
+        width="100%"
       >
-        <Text fontSize="xxx-large">Imagem do celular</Text>
+        <Image src="/home-page-phone.jpg" alt="Phone Image" borderRadius={10} />
       </Flex>
     </Grid>
   );
 };
-// 📲📱

@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
 
 const manifest = (): MetadataRoute.Manifest => ({
-  short_name: 'nextarter-chakra',
-  name: 'Next.js App Template',
-  lang: 'en',
+  short_name: 'finances-ai',
+  name: 'Finanças-IA',
+  lang: 'pt-BR',
   start_url: '/',
   background_color: '#FFFFFF',
   theme_color: '#FFFFFF',

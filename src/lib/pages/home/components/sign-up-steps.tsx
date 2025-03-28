@@ -1,5 +1,7 @@
-import { Button, Flex, Input, Text } from '@chakra-ui/react';
+import { Button, Flex, Grid, Input, Text } from '@chakra-ui/react';
 import { StepProvider, useStep } from '../context/sign-up-steps-context';
+import { EmailStep } from './email-setp';
+import { PhoneNumberStep } from './phone-number-step';
 
 export function SignUpSteps() {
   const { step, nextStep } = useStep();
@@ -18,32 +20,12 @@ export function SignUpSteps() {
       <Text fontSize="large" textAlign="center">
         Receba análises personalizadas para controle dos gastos
       </Text>
-      <Flex gap={2} width="100%">
+      <Grid templateColumns="2fr 1fr" gap={2} width="100%">
         {step === 0 && ( // Step 1: WhatsApp input
-          <>
-            <Input
-              type="tel"
-              variant="subtle"
-              size="lg"
-              placeholder="Número do WhatsApp 📲"
-            />
-            <Button colorScheme="blue" onClick={nextStep}>
-              Continuar
-            </Button>
-          </>
+          <PhoneNumberStep />
         )}
         {step === 1 && ( // Step 2: Email input
-          <>
-            <Input
-              type="email"
-              variant="subtle"
-              size="lg"
-              placeholder="Digite seu email 📧"
-            />
-            <Button colorScheme="blue" onClick={nextStep}>
-              Continuar
-            </Button>
-          </>
+          <EmailStep />
         )}
         {step === 2 && ( // Step 3: Verification code input
           <>
@@ -51,19 +33,27 @@ export function SignUpSteps() {
               type="text"
               variant="subtle"
               size="lg"
+              width="100%"
               placeholder="Código de verificação"
             />
-            <Button colorScheme="blue" onClick={nextStep}>
+            <Button
+              colorScheme="blue"
+              onClick={() => {
+                nextStep();
+              }}
+              height="100%"
+              type="submit"
+            >
               Continuar
             </Button>
           </>
         )}
         {step === 3 && ( // Step 4: Final message or action
-          <Text fontSize="large" textAlign="center">
+          <Text gridColumn="1 / -1" textAlign="center" fontSize="large">
             Obrigado! Você está pronto para começar.
           </Text>
         )}
-      </Flex>
+      </Grid>
     </Flex>
   );
 }
