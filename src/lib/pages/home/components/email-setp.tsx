@@ -1,13 +1,17 @@
 import { Button, Input } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStep } from '../context/sign-up-steps-context';
 
 export function EmailStep() {
-  const { nextStep, setFormState } = useStep();
+  const { nextStep, setFormState, formState } = useStep();
 
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setEmail(formState.email);
+  }, [formState.email]);
 
   async function handleNextStep() {
     const isValid =
@@ -18,7 +22,21 @@ export function EmailStep() {
       setFormState((prev) => ({ ...prev, email }));
 
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch('/api/sign-up/email-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          name: formState.name,
+          phoneNumber: formState.phoneNumber,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
       setLoading(false);
 
       nextStep();
@@ -35,6 +53,7 @@ export function EmailStep() {
         variant="subtle"
         size="lg"
         onChange={(e) => setEmail(e.target.value)}
+        value={email}
         placeholder="Digite seu email 📧"
         aria-invalid={error ? 'true' : 'false'}
       />

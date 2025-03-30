@@ -1,10 +1,19 @@
-import { Button, Flex, Grid, Input, Text } from '@chakra-ui/react';
+import { Flex, Grid, Text } from '@chakra-ui/react';
+import { LuCircleArrowLeft } from 'react-icons/lu';
 import { StepProvider, useStep } from '../context/sign-up-steps-context';
+import { CodeValidationStep } from './code-validation-step';
 import { EmailStep } from './email-setp';
+import { NameStep } from './name-step';
 import { PhoneNumberStep } from './phone-number-step';
 
 export function SignUpSteps() {
-  const { step, nextStep } = useStep();
+  const { step, prevStep } = useStep();
+
+  function handleBackStep() {
+    if (step > 0 && step < 4) {
+      prevStep();
+    }
+  }
 
   return (
     <Flex
@@ -20,40 +29,26 @@ export function SignUpSteps() {
       <Text fontSize="large" textAlign="center">
         Receba análises personalizadas para controle dos gastos
       </Text>
-      <Grid templateColumns="2fr 1fr" gap={2} width="100%">
-        {step === 0 && ( // Step 1: WhatsApp input
-          <PhoneNumberStep />
-        )}
-        {step === 1 && ( // Step 2: Email input
-          <EmailStep />
-        )}
-        {step === 2 && ( // Step 3: Verification code input
-          <>
-            <Input
-              type="text"
-              variant="subtle"
-              size="lg"
-              width="100%"
-              placeholder="Código de verificação"
-            />
-            <Button
-              colorScheme="blue"
-              onClick={() => {
-                nextStep();
-              }}
-              height="100%"
-              type="submit"
-            >
-              Continuar
-            </Button>
-          </>
-        )}
-        {step === 3 && ( // Step 4: Final message or action
-          <Text gridColumn="1 / -1" textAlign="center" fontSize="large">
+      <Grid templateColumns="2fr 1fr" gap={2} width="100%" mt={30}>
+        {step === 0 && <PhoneNumberStep />}
+        {step === 1 && <EmailStep />}
+        {step === 2 && <CodeValidationStep />}
+        {step === 3 && <NameStep />}
+        {step === 4 && (
+          <Text gridColumn="1 / -1" textAlign="center" fontSize="x-large">
             Obrigado! Você está pronto para começar.
           </Text>
         )}
       </Grid>
+      <Flex alignSelf="self-end">
+        <LuCircleArrowLeft
+          size={20}
+          style={{
+            cursor: 'pointer',
+          }}
+          onClick={handleBackStep}
+        />
+      </Flex>
     </Flex>
   );
 }

@@ -1,25 +1,20 @@
-import { Button, Input } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import { withMask } from 'use-mask-input';
+import { Button, Input, Text } from '@chakra-ui/react';
+import { useState } from 'react';
 import { useStep } from '../context/sign-up-steps-context';
 
-export function PhoneNumberStep() {
-  const { nextStep, setFormState, formState } = useStep();
+export function CodeValidationStep() {
+  const { nextStep, setFormState } = useStep();
 
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [name, setName] = useState<string>('');
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    setPhoneNumber(formState.phoneNumber);
-  }, [formState.phoneNumber]);
-
   async function handleNextStep() {
-    const isValid = phoneNumber?.length === 15 && !phoneNumber.includes('_');
+    const isValid = name.length >= 3;
 
     if (isValid) {
       setError(false);
-      setFormState((prev) => ({ ...prev, phoneNumber }));
+      setFormState((prev) => ({ ...prev, name }));
 
       setLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -34,15 +29,17 @@ export function PhoneNumberStep() {
 
   return (
     <>
+      <Text fontSize="medium" fontWeight="light" gridColumn="1 / -1">
+        Enviamos um código de confirmação em seu email
+      </Text>
       <Input
-        type="tel"
+        type="number"
         variant="subtle"
         size="lg"
-        ref={withMask('(99) 99999-9999')}
-        onChange={(e) => setPhoneNumber(e.target.value)}
-        value={phoneNumber}
-        placeholder="Número do WhatsApp 📲"
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Código de confirmação"
         aria-invalid={error ? 'true' : 'false'}
+        className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
       <Button
         colorScheme="blue"

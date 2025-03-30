@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 
 import { Provider } from '@/components/ui/provider';
 import { Layout } from '@/lib/layout';
+import '../lib/styles/globals.css';
 
 type RootLayoutProps = {
   children: React.ReactNode;
