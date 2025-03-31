@@ -1,6 +1,7 @@
 import { Button, Input } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useStep } from '../context/sign-up-steps-context';
+import { generateEmailConfirmation } from '@/lib/services/sing-up';
 
 export function EmailStep() {
   const { nextStep, setFormState, formState } = useStep();
@@ -22,23 +23,16 @@ export function EmailStep() {
       setFormState((prev) => ({ ...prev, email }));
 
       setLoading(true);
-      const response = await fetch('/api/sign-up/email-confirmation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          name: formState.name,
-          phoneNumber: formState.phoneNumber,
-        }),
+
+      await generateEmailConfirmation({
+        email,
+        name: formState.name,
+        phoneNumber: formState.phoneNumber,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send email');
-      }
-      setLoading(false);
+      localStorage.setItem('emailConfirmationSentAt', Date.now().toString());
 
+      setLoading(false);
       nextStep();
       return;
     }
