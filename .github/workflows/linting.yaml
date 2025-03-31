@@ -14,7 +14,8 @@ jobs:
           node-version: 'lts/hydrogen'
           cache: 'pnpm'
 
-      - run: corepack enable
+      - run: npm install -g pnpm
+
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm run lint:prettier:check
@@ -30,7 +31,8 @@ jobs:
           node-version: 'lts/hydrogen'
           cache: 'pnpm'
 
-      - run: corepack enable
+      - run: npm install -g pnpm
+
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm run lint:eslint:check
