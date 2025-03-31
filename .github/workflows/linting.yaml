@@ -12,10 +12,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/hydrogen'
+          cache: 'pnpm'
 
-      - run: pnpm ci
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
 
       - run: pnpm run lint:prettier:check
+
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
@@ -25,7 +28,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/hydrogen'
+          cache: 'pnpm'
 
-      - run: pnpm ci
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
 
-      - run: pnpm lint:eslint:check
+      - run: pnpm run lint:eslint:check
