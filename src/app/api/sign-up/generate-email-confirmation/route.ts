@@ -8,28 +8,29 @@ export async function POST(request: Request) {
     phoneNumber: string;
   };
 
+  if (!email /*|| !name */ || !phoneNumber) {
+    return new Response('Missing parameters', {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   try {
     const confirmationCode = Math.floor(
       100000 + Math.random() * 900000
     ).toString();
 
-    const formattedNumber =
-      '55' +
-      phoneNumber
-        .replace('(', '')
-        .replace(')', '')
-        .replace('-', '')
-        .replaceAll(' ', '')
-        .replace('9', '');
-
     const { usersCollection } = await getCollections();
+
     await usersCollection.updateOne(
-      { email: email.trim(), phoneNumber: formattedNumber },
+      { email: email.trim(), phoneNumber },
       {
         $set: {
+          creationTimestamp: Date.now(),
+          emailVerified: false,
           emailConfirmation: {
-            confirmationCode,
-            confirmationExpires: Date.now() + 15 * 60 * 1000, // 15 minutes in ms
+            code: confirmationCode,
+            expiresAt: Date.now() + 30 * 60 * 1000, // 30 minutes in ms
           },
         },
       },

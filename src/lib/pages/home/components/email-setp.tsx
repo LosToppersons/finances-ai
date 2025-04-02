@@ -20,12 +20,12 @@ export function EmailStep() {
 
     if (isValid) {
       setError(false);
-      setFormState((prev) => ({ ...prev, email }));
+      setFormState((prev) => ({ ...prev, email: email.trim() }));
 
       setLoading(true);
 
       await generateEmailConfirmation({
-        email,
+        email: email.trim(),
         name: formState.name,
         phoneNumber: formState.phoneNumber,
       });

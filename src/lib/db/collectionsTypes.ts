@@ -7,6 +7,11 @@ export type User = {
   chatId: string;
   email: string;
   creationTimestamp: number;
+  emailVerified: boolean;
+  emailConfirmation?: {
+    code: string;
+    expiresAt: number;
+  };
 };
 
 export type Transaction = {

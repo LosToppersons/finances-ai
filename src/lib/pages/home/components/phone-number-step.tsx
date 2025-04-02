@@ -19,7 +19,8 @@ export function PhoneNumberStep() {
 
     if (isValid) {
       setError(false);
-      setFormState((prev) => ({ ...prev, phoneNumber }));
+
+      setFormState((prev) => ({ ...prev, phoneNumber: phoneNumber }));
 
       setLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));

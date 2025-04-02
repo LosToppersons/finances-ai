@@ -2,7 +2,7 @@
   "name": "finances-ai",
   "version": "0.1.0",
   "private": true,
-  "author": "agustinusnathaniel",
+  "author": "lstop",
   "engines": {
     "node": ">=22.11.x",
     "pnpm": ">=9"

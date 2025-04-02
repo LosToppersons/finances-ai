@@ -1,12 +1,15 @@
-import { generateEmailConfirmation } from '@/lib/services/sing-up';
+import {
+  generateEmailConfirmation,
+  validateCode,
+} from '@/lib/services/sing-up';
 import { Button, Flex, Input, Text } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useStep } from '../context/sign-up-steps-context';
 
 export function CodeValidationStep() {
-  const { nextStep, formState, setFormState } = useStep();
+  const { nextStep, formState } = useStep();
 
-  const [name, setName] = useState<string>('');
+  const [code, setCode] = useState<string>('');
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingResend, setLoadingResend] = useState<boolean>(false);
@@ -17,7 +20,7 @@ export function CodeValidationStep() {
     const emailSentAt = localStorage.getItem('emailConfirmationSentAt');
     if (emailSentAt) {
       const timePassed = Date.now() - parseInt(emailSentAt);
-      const remaining = Math.max(30_000 - timePassed, 0);
+      const remaining = Math.max(120_000 - timePassed, 0);
 
       if (remaining > 0) {
         setCanResend(false);
@@ -41,12 +44,21 @@ export function CodeValidationStep() {
   }, []);
 
   async function handleNextStep() {
-    if (name.length >= 3) {
+    console.log('AAAAAAAAAA');
+    if (code.length === 6) {
       setError(false);
-      setFormState((prev) => ({ ...prev, name }));
 
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('submitting', {
+        code,
+        email: formState.email,
+        phoneNumber: formState.phoneNumber,
+      });
+      await validateCode({
+        code,
+        email: formState.email,
+        phoneNumber: formState.phoneNumber,
+      });
       setLoading(false);
 
       nextStep();
@@ -92,7 +104,7 @@ export function CodeValidationStep() {
         type="number"
         variant="subtle"
         size="lg"
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => setCode(e.target.value)}
         placeholder="Código de confirmação"
         aria-invalid={error ? 'true' : 'false'}
         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
