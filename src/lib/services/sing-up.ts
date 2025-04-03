@@ -6,7 +6,7 @@ export async function generateEmailConfirmation({
   email: string;
   name: string;
   phoneNumber: string;
-}) {
+}): Promise<void> {
   const response = await fetch('/api/sign-up/generate-email-confirmation', {
     method: 'POST',
     headers: {
@@ -20,7 +20,12 @@ export async function generateEmailConfirmation({
   });
 
   if (!response.ok) {
-    throw new Error('Failed to send email');
+    const errorJson = (await response.json()) as {
+      error: string;
+    };
+
+    console.error('Error generating email confirmation:', errorJson.error);
+    throw new Error(errorJson.error);
   }
 }
 
@@ -44,15 +49,15 @@ export async function validateCode({
       phoneNumber: formattedNumber(phoneNumber),
     }),
   });
-  console.log('response - code response validation', response);
-  const data = await response.text();
-  console.log('data - code response validation', data);
 
   if (!response.ok) {
-    throw new Error('Failed to validate code');
-  }
+    const errorJson = (await response.json()) as {
+      error: string;
+    };
 
-  return data;
+    console.error('Error confirming code:', errorJson.error);
+    throw new Error(errorJson.error);
+  }
 }
 
 const formattedNumber = (phoneNumber: string) => {

@@ -1,7 +1,8 @@
+import { toaster } from '@/components/ui/toaster';
+import { generateEmailConfirmation } from '@/lib/services/sing-up';
 import { Button, Input } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useStep } from '../context/sign-up-steps-context';
-import { generateEmailConfirmation } from '@/lib/services/sing-up';
 
 export function EmailStep() {
   const { nextStep, setFormState, formState } = useStep();
@@ -16,28 +17,49 @@ export function EmailStep() {
 
   async function handleNextStep() {
     const isValid =
-      email?.length > 5 || email.includes('@') || email.includes('.');
+      email?.length > 5 && email.includes('@') && email.includes('.');
 
-    if (isValid) {
-      setError(false);
-      setFormState((prev) => ({ ...prev, email: email.trim() }));
-
-      setLoading(true);
-
-      await generateEmailConfirmation({
-        email: email.trim(),
-        name: formState.name,
-        phoneNumber: formState.phoneNumber,
-      });
-
-      localStorage.setItem('emailConfirmationSentAt', Date.now().toString());
-
-      setLoading(false);
-      nextStep();
+    if (!isValid) {
+      setError(true);
       return;
     }
 
-    setError(true);
+    setLoading(true);
+    setError(false);
+    setFormState((prev) => ({ ...prev, email: email.trim() }));
+
+    const emailCodePromise = generateEmailConfirmation({
+      email: email.trim(),
+      name: formState.name,
+      phoneNumber: formState.phoneNumber,
+    });
+
+    toaster.promise(emailCodePromise, {
+      success: {
+        title: 'Sucesso!',
+        description:
+          'O email de confirmação foi enviado. Verifique sua caixa de spam!',
+      },
+      error: {
+        title: 'Falha ao enviar email',
+        description: 'Verifique se os dados estão corretos e tente novamente.',
+      },
+      loading: {
+        title: 'Enviando...',
+        description: 'Seu email de confirmação está sendo enviado',
+      },
+    });
+
+    emailCodePromise
+      .then(() => {
+        localStorage.setItem('emailConfirmationSentAt', Date.now().toString());
+        setLoading(false);
+        nextStep();
+      })
+      .catch(() => {
+        setLoading(false);
+        setError(true);
+      });
   }
 
   return (

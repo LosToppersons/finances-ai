@@ -30,10 +30,10 @@ export function SignUpSteps() {
         Receba análises personalizadas para controle dos gastos
       </Text>
       <Grid templateColumns="2fr 1fr" gap={2} width="100%" mt={30}>
-        {step === 0 && <PhoneNumberStep />}
-        {step === 1 && <EmailStep />}
-        {step === 2 && <CodeValidationStep />}
-        {step === 3 && <NameStep />}
+        {step === 0 && <NameStep />}
+        {step === 1 && <PhoneNumberStep />}
+        {step === 2 && <EmailStep />}
+        {step === 3 && <CodeValidationStep />}
         {step === 4 && (
           <Text gridColumn="1 / -1" textAlign="center" fontSize="x-large">
             Obrigado! Você está pronto para começar.

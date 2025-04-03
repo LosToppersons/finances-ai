@@ -1,26 +1,31 @@
+import { toaster } from '@/components/ui/toaster';
 import {
   generateEmailConfirmation,
   validateCode,
 } from '@/lib/services/sing-up';
-import { Button, Flex, Input, Text } from '@chakra-ui/react';
+import { Button, Checkbox, Flex, Input, Text } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useStep } from '../context/sign-up-steps-context';
+
+const TIME_TO_RESEND = 30_000; // 2 minutos
 
 export function CodeValidationStep() {
   const { nextStep, formState } = useStep();
 
   const [code, setCode] = useState<string>('');
   const [error, setError] = useState<boolean>(false);
+  const [termsError, setTermsError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingResend, setLoadingResend] = useState<boolean>(false);
   const [canResend, setCanResend] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
 
   useEffect(() => {
     const emailSentAt = localStorage.getItem('emailConfirmationSentAt');
     if (emailSentAt) {
       const timePassed = Date.now() - parseInt(emailSentAt);
-      const remaining = Math.max(120_000 - timePassed, 0);
+      const remaining = Math.max(TIME_TO_RESEND - timePassed, 0);
 
       if (remaining > 0) {
         setCanResend(false);
@@ -44,27 +49,53 @@ export function CodeValidationStep() {
   }, []);
 
   async function handleNextStep() {
-    console.log('AAAAAAAAAA');
-    if (code.length === 6) {
-      setError(false);
-
-      setLoading(true);
-      console.log('submitting', {
-        code,
-        email: formState.email,
-        phoneNumber: formState.phoneNumber,
-      });
-      await validateCode({
-        code,
-        email: formState.email,
-        phoneNumber: formState.phoneNumber,
-      });
-      setLoading(false);
-
-      nextStep();
+    if (code.length !== 6) {
+      setError(true);
       return;
     }
-    setError(true);
+
+    if (!termsAccepted) {
+      setTermsError(true);
+      toaster.create({
+        title: 'É necessário aceitar os termos e condições para prosseguir',
+      });
+      return;
+    }
+
+    setTermsError(false);
+    setError(false);
+    setLoading(true);
+
+    const validateCodePromise = validateCode({
+      code,
+      email: formState.email,
+      phoneNumber: formState.phoneNumber,
+    });
+
+    toaster.promise(validateCodePromise, {
+      success: {
+        title: 'Sucesso!',
+        description: 'Seu email foi confirmado! Seja bem-vindo ao Finaças-IA!.',
+      },
+      error: {
+        title: 'Falha ao validar código',
+        description: 'Verifique se o código está correto e tente novamente.',
+      },
+      loading: {
+        title: 'Validando...',
+        description: 'Estamos confirmando seu código',
+      },
+    });
+
+    validateCodePromise
+      .then(() => {
+        setLoading(false);
+        nextStep();
+      })
+      .catch(() => {
+        setLoading(false);
+        setError(true);
+      });
   }
 
   async function handleResendCode() {
@@ -72,16 +103,45 @@ export function CodeValidationStep() {
 
     setLoadingResend(true);
 
-    await generateEmailConfirmation({
-      email: formState.email,
-      name: formState.name,
-      phoneNumber: formState.phoneNumber,
+    setTermsError(false);
+    setError(false);
+    setLoadingResend(true);
+
+    const emailCodePromise = generateEmailConfirmation({
+      email: formState.email.trim(),
+      name: formState.name.trim(),
+      phoneNumber: formState.phoneNumber.trim(),
     });
 
-    localStorage.setItem('emailConfirmationSentAt', Date.now().toString());
-    setCanResend(false);
-    setLoadingResend(false);
-    setTimeLeft(30);
+    toaster.promise(emailCodePromise, {
+      success: {
+        title: 'Sucesso!',
+        description:
+          'O email de confirmação foi enviado. Verifique sua caixa de spam!',
+      },
+      error: {
+        title: 'Falha ao enviar email',
+        description: 'Verifique se os dados estão corretos e tente novamente.',
+      },
+      loading: {
+        title: 'Enviando...',
+        description: 'Seu email de confirmação está sendo enviado',
+      },
+    });
+
+    emailCodePromise
+      .then(() => {
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+        setError(true);
+      })
+      .finally(() => {
+        setTimeLeft(TIME_TO_RESEND);
+        setLoadingResend(false);
+        localStorage.setItem('emailConfirmationSentAt', Date.now().toString());
+      });
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -145,6 +205,26 @@ export function CodeValidationStep() {
         >
           Reenviar
         </Button>
+      </Flex>
+      <Flex
+        gridColumn="1 / -1"
+        mt={4}
+        gap={2}
+        alignItems="start"
+        justifyContent="start"
+      >
+        <Checkbox.Root
+          checked={termsAccepted}
+          onCheckedChange={(e) => setTermsAccepted(!!e.checked)}
+          invalid={termsError}
+          color={termsError ? 'red.500' : ''}
+        >
+          <Checkbox.HiddenInput />
+          <Checkbox.Control />
+          <Checkbox.Label>
+            Li e concordo com todos os termos e condições.
+          </Checkbox.Label>
+        </Checkbox.Root>
       </Flex>
     </>
   );

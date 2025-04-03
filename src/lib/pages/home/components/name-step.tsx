@@ -14,7 +14,7 @@ export function NameStep() {
   }, [formState.name]);
 
   async function handleNextStep() {
-    const isValid = name.length >= 3;
+    const isValid = name.length >= 3 || !/\d/.test(name);
 
     if (isValid) {
       setError(false);
